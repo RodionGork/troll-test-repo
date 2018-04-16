@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>Testable Calculator</title>
+<style>
+input[type=text] {
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+
+<center>
+  <h1>Calcluator</h1>
+  <p>
+  enter two numbers and click button
+  </p>
+  <input type="text" id="num1" placeholder="3.0"/>
+  <input type="text" id="num2" placeholder="3.0"/>
+  <br/><br/>
+  <button id="btnadd">+</button>
+  <button id="btnsub">-</button>
+  <button id="btnmul">*</button>
+  <button id="btndiv">/</button>
+  <br/><br/>
+  Answer:<br/><input disabled="disabled" id="answer"/>
+</center>
+
+
+<script>
+function gbid(s) {
+  return document.getElementById(s);
+}
+
+function calc(f) {
+  var a = Math.abs(gbid('num1').value * 1.0);
+  var b = Math.abs(gbid('num2').value * 1.0);
+  gbid('answer').value = f(a, b);
+}
+
+window.onload = function() {
+  gbid('btnadd').onclick = function() {
+    calc(function(a, b) { return a + b });
+  }
+  gbid('btnsub').onclick = function() {
+    calc(function(a, b) { return b - a });
+  }
+  gbid('btnmul').onclick = function() {
+    calc(function(a, b) { return a * b });
+  }
+  gbid('btndiv').onclick = function() {
+    calc(function(a, b) { return Math.floor(Math.floor(a) / Math.floor(b)) });
+  }
+}
+</script>
+
+</body>
+</html>
