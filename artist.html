@@ -1,6 +1,21 @@
-<input id="command" type="text"/>
-<button id="run">Draw</button>
-<br/>
+<html>
+<head>
+    <title>Simple turtle drawing</title>
+    <style>
+        #drawing {
+          border: 1px solid #999;
+        }
+        #command {
+          width: 400px;
+          height: 150px;
+        }
+    </style>
+</head>
+<body>
+    
+<textarea id="command"></textarea><br/>
+<button id="run">Draw</button> <button id="run2">Draw Slowly</button>
+<br/><br/>
 <canvas id="drawing" width="400" height="300"></canvas>
 
 <script>
@@ -8,15 +23,17 @@ var canvas = document.getElementById('drawing');
 var ctx = canvas.getContext('2d');
 
 var cx, cy, ca, pen;
-
-ctx.fillStyle = 'rgb(200, 0, 0)';
-ctx.fillRect(10, 10, 50, 50);
+var cmds;
+var delay;
 
 function reinit() {
-    cx = 0;
-    cy = 0;
+    cx = Math.floor(canvas.width / 2) + 0.5;
+    cy = Math.floor(canvas.height / 2) + 0.5;
     ca = 0;
     pen = true;
+    ctx.lineWidth = 2;
+    ctx.fillStyle = 'rgb(255, 255, 255)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function rot(da) {
@@ -39,34 +56,45 @@ function fwd(len) {
         ctx.moveTo(cx, cy);
         ctx.lineTo(tx, ty);
         ctx.stroke();
-        //alert(JSON.stringify(["draw", cx, cy, cx+dx, cy+dy]));
     }
     cx = tx;
     cy = ty;
 }
 
-function execCmd(cmd) {
+function execCmd() {
+    if (cmds.length == 0) {
+        return;
+    }
+    var cmd = cmds.shift();
     if (cmd.length == 0) {
         return;
     }
+    var d = 1;
     var code = cmd.charAt(0);
     var value = cmd.length > 1 ? parseInt(cmd.substring(1)) : NaN;
     switch (code) {
-        case "F": fwd(value); break;
-        case "B": fwd(-value); break;
+        case "F": fwd(value); d = delay; break;
+        case "B": fwd(-value); d = delay; break;
         case "L": rot(-value); break;
         case "R": rot(value); break;
         case "U": pen = false; break;
         case "D": pen = true; break;
         default: alert("Unknown command: " + cmd);
     }
+    setTimeout(execCmd, d);
 }
 
-function execute() {
+function execute(slowness) {
+		delay = slowness > 1 ? slowness : 1;
     reinit();
-    var cmds = document.getElementById("command").value;
-    cmds.toUpperCase().split(/\s+/).forEach(execCmd);
+    var cmdLine = document.getElementById("command").value;
+    cmds = cmdLine.toUpperCase().split(/\s+/);
+    execCmd();
 }
 
-document.getElementById("run").onclick = execute;
+document.getElementById("run").onclick = function() { execute(0) };
+document.getElementById("run2").onclick = function() { execute(130) };
 </script>
+
+</body>
+</html>
