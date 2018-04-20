@@ -1,0 +1,72 @@
+<input id="command" type="text"/>
+<button id="run">Draw</button>
+<br/>
+<canvas id="drawing" width="400" height="300"></canvas>
+
+<script>
+var canvas = document.getElementById('drawing');
+var ctx = canvas.getContext('2d');
+
+var cx, cy, ca, pen;
+
+ctx.fillStyle = 'rgb(200, 0, 0)';
+ctx.fillRect(10, 10, 50, 50);
+
+function reinit() {
+    cx = 0;
+    cy = 0;
+    ca = 0;
+    pen = true;
+}
+
+function rot(da) {
+    ca += da;
+    while (ca >= 180) {
+        ca -= 360;
+    }
+    while (ca < -180) {
+        ca += 360;
+    }
+}
+
+function fwd(len) {
+    var dx = len * Math.cos(ca * Math.PI / 180);
+    var dy = len * Math.sin(ca * Math.PI / 180);
+    var tx = Math.round(cx + dx);
+    var ty = Math.round(cy + dy);
+    if (pen) {
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(tx, ty);
+        ctx.stroke();
+        //alert(JSON.stringify(["draw", cx, cy, cx+dx, cy+dy]));
+    }
+    cx = tx;
+    cy = ty;
+}
+
+function execCmd(cmd) {
+    if (cmd.length == 0) {
+        return;
+    }
+    var code = cmd.charAt(0);
+    var value = cmd.length > 1 ? parseInt(cmd.substring(1)) : NaN;
+    switch (code) {
+        case "F": fwd(value); break;
+        case "B": fwd(-value); break;
+        case "L": rot(-value); break;
+        case "R": rot(value); break;
+        case "U": pen = false; break;
+        case "D": pen = true; break;
+        default: alert("Unknown command: " + cmd);
+    }
+}
+
+function execute() {
+    reinit();
+    var cmds = document.getElementById("command").value;
+    cmds.toUpperCase().split(/\s+/).forEach(execCmd);
+}
+
+document.getElementById("run").onclick = execute;
+</script>
